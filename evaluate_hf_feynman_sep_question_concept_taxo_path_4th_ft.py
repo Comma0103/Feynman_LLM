@@ -29,7 +29,7 @@ def format_example(df, idx, include_answer=True):
         prompt += "\nAnswer:"
         prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
     else:
-        prompt += "\nAnswer (Just choosing from A, B, C, and D without any extra words):"
+        prompt += "\nAnswer (choosing from A, B, C, and D):"
     return prompt
 
 def gen_prompt(train_df, subject, k=-1):
@@ -316,5 +316,5 @@ if __name__ == "__main__":
     parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
     parser.add_argument("--expl_model_name", "-en", type=str, default="OpenAI-GPT-4o-mini-0903-gen-4th")
     args = parser.parse_args()
-    args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}_just"
+    args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}"
     main(args)
