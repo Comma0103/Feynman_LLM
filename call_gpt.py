@@ -60,6 +60,13 @@ API_INFOS = {
             "model": "gpt-4o-mini"
         },
     ],
+    "OpenAI-GPT-4o-mini-0903-gen-4th": [
+        {
+            "endpoints": "https://readinnorthcentralus.openai.azure.com/",
+            "speed": 150,
+            "model": "gpt-4o-mini-2024-07-18-qilong-0903-gen-4th"
+        },
+    ],
 }
 
 
@@ -154,7 +161,7 @@ class Openai():
 
 if __name__ == '__main__':
     oai_clients = Openai(
-        apis=API_INFOS["OpenAI-GPT-4o-mini"]
+        apis=API_INFOS["OpenAI-GPT-4o-mini-0903-gen-4th"]
     )
     res = oai_clients.call("hello", return_logits=True, max_tokens=1)
     print(res)

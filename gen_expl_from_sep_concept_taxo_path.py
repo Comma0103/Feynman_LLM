@@ -131,3 +131,5 @@ if __name__ == "__main__":
     parser.add_argument("--expl_model_name", "-en", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
     main(args)
+
+# python gen_expl_from_sep_concept_taxo_path.py --data_dir D:\2024\git\qilong\0902\mmlu_data --concept_dir D:\2024\git\qilong\0902\concepts --expl_dir D:\2024\git\qilong\0902\explanations --concept_model_name OpenAI-GPT-4o-mini --taxo_path_src gen --expl_model_name OpenAI-GPT-4o-mini-0903-gen-4th

@@ -199,3 +199,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.exp_name = f"{args.model_name}"
     main(args)
+
+# python evaluate_oai.py--data_dir D:\2024\git\qilong\0902\mmlu_data --save_dir D:\2024\git\qilong\0902\results --expl_model_name OpenAI-GPT-4o-mini-0903-gen-4th
