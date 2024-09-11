@@ -168,3 +168,5 @@ ftdata/*
 results/*
 LICENSE
 README.md
+
+.amltconfig
