@@ -82,7 +82,7 @@ storage:
 
 search:
   job_template:
-    name: 
+    name: test_hf_sep_q_conc_taxop_llama2-70b_1st
     sku: 1x40G8
     # sku: 2x40G8-A100-IB-NvLink
     identity: managed
@@ -103,7 +103,15 @@ search:
     # - ls /mnt/conversationhubhot
     # - FORCE_TORCHRUN=1 llamafactory-cli train bash_script/{script}
     # - torchrun --nproc_per_node=8 --nnodes=2 --node_rank=$$OMPI_COMM_WORLD_RANK --master_addr="$$MASTER_ADDR" --master_port=$$MASTER_PORT src/train.py bash_script/{script}
-    - torchrun --nproc_per_node=8 src/train.py bash_script/{script}
+    # - torchrun --nproc_per_node=8 src/train.py bash_script/{script}
+    - python -u evaluate_hf_feynman_sep_question_concept_taxo_path.py
+      --data_dir /mnt/qilongma/mmlu_data
+      --expl_dir /mnt/qilongma/explanations
+      --save_dir /mnt/qilongma/results
+      --model_path /mnt/qilongma/public_models/Meta-Llama-2-70B-hf
+      --model_name Meta-Llama-2-70B
+      --taxo_path_src gen
+      --expl_model_name OpenAI-GPT-4o-mini
     submit_args:
       env:
         {"SINGULARITY_MPI_ENV":"-mca pml ucx --mca btl ^vader,tcp,openib -x NCCL_SOCKET_IFNAME=bond0 -x NCCL_IB_HCA=mlx5_0,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_9,mlx5_10,mlx5_11 -x NCCL_DEBUG=INFO"}
@@ -119,5 +127,6 @@ search:
       # values: ['ta_chosen_llama3.1_instruct_dpo_2048_default_template_job.yaml', 'ta_chosen_tuluv2_dpo_2048_default_template_job.yaml', 'ta_rejected_llama3.1_instruct_dpo_2048_default_template_job.yaml', 'ta_rejected_tuluv2_dpo_2048_default_template_job.yaml']
       # values: ['ta_rejected_tuluv2_dpo_2048_default_template_job.yaml', 'ta_rejected_tuluv2_dpo_2048_default_template_v2_job.yaml', 'ta_rejected_tuluv2_dpo_2048_default_template_v3_job.yaml']
       # values: ['glanchatv2_full_sft_2048_default_template_job_lr5e6_e3.yaml', 'glanv2_full_sft_2048_default_template_job_lr5e6_e3.yaml', 'glanv2_glanchatv2_full_sft_2048_default_template_job_lr5e6_e3.yaml']
-      values: ['glanv2_glanchatv2_full_sft_2048_default_template_job_lr5e6_e3.yaml']
+      # values: ['glanv2_glanchatv2_full_sft_2048_default_template_job_lr5e6_e3.yaml']
+      values: ['']
 
