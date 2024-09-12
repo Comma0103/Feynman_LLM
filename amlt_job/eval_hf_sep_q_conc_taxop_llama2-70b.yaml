@@ -18,10 +18,17 @@ description: test llama2-70b on MMLU
 #   resource_group: gcr-singularity-resrch
 #   workspace_name: Workspace_NLC
 
+# target:
+#   service: sing
+#   name: msroctobasicvc
+#   resource_group: gcr-singularity-octo
+#   # workspace_name: Workspace_NLC
+#   workspace_name: NLC_Workspace
+
 target:
   service: sing
-  name: msroctobasicvc
-  resource_group: gcr-singularity-octo
+  name: msrresrchbasicvc
+  resource_group: gcr-singularity
   # workspace_name: Workspace_NLC
   workspace_name: NLC_Workspace
 
