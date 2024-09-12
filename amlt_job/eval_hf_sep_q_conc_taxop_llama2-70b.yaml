@@ -91,7 +91,8 @@ search:
     # mpi: True
     # process_count_per_node: 8
     command:
-    - pip install -e ".[torch,pandas,transformers]"
+    # - pip install -e ".[torch,pandas,transformers]"
+    - pip install torch,pandas,transformers
     # - pip install deepspeed==0.14.4
     - echo $${script}
     # - bash amlt_job/sas_mount.sh
