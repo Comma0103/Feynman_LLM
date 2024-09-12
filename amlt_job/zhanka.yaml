@@ -5,12 +5,12 @@ description: test
 #   service: aml
 #   name: alta2
 
-# target:
-#   service: sing
-#   name: msroctovc
-#   resource_group: gcr-singularity-octo
-#   # workspace_name: Workspace_NLC
-#   workspace_name: NLC_Workspace
+target:
+  service: sing
+  name: msroctovc
+  resource_group: gcr-singularity-octo
+  # workspace_name: Workspace_NLC
+  workspace_name: NLC_Workspace
 
 # target:
 #   service: sing
@@ -25,12 +25,12 @@ description: test
 #   # workspace_name: Workspace_NLC
 #   workspace_name: NLC_Workspace
 
-target:
-  service: sing
-  name: msrresrchbasicvc
-  resource_group: gcr-singularity
-  # workspace_name: Workspace_NLC
-  workspace_name: NLC_Workspace
+# target:
+#   service: sing
+#   name: msrresrchbasicvc
+#   resource_group: gcr-singularity
+#   # workspace_name: Workspace_NLC
+#   workspace_name: NLC_Workspace
 
 
 # environment:
@@ -90,11 +90,11 @@ storage:
 
 search:
   job_template:
-    name: zhanka_resrchbasicvc
-    sku: 1x80G4-A100
+    name: zhanka_std
+    sku: 1x40G8-A100
     # sku: 2x40G8-A100-IB-NvLink
     identity: managed
-    sla_tier: Basic
+    sla_tier: Standard
     priority: High
     mpi: True
     process_count_per_node: 1
