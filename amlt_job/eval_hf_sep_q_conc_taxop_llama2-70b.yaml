@@ -82,7 +82,7 @@ storage:
 
 search:
   job_template:
-    name: test_hf_sep_q_conc_taxop_llama2-70b_1st
+    name: test_hf_sep_q_conc_taxop_llama2-70b_1st_new
     sku: 1x40G8
     # sku: 2x40G8-A100-IB-NvLink
     identity: managed
@@ -91,7 +91,7 @@ search:
     # mpi: True
     # process_count_per_node: 8
     command:
-    - pip install -e ".[torch,metrics]"
+    - pip install -e ".[torch,pandas,transformers]"
     # - pip install deepspeed==0.14.4
     - echo $${script}
     # - bash amlt_job/sas_mount.sh
