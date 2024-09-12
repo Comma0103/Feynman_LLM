@@ -1,4 +1,4 @@
-azure_storage==0.37.0
+# azure_storage==0.37.0
 matplotlib==3.8.4
 numpy==1.24.3
 openai==1.44.1
