@@ -80,6 +80,7 @@ class Openai():
                     DefaultAzureCredential(managed_identity_client_id=self.identity_id),
                     "https://cognitiveservices.azure.com/.default"
                 )
+                print("DefaultAzureCredential success!!!!!!!!!!!")
                 flag = False
             except Exception as e_A:
                 print(f"DefaultAzureCredential failed with error: {e_A}")
