@@ -157,10 +157,10 @@ class Openai():
                 return results
             except openai.RateLimitError as e:
                 time.sleep(1)
-            except Exception as e:
-                print(e)
-                print("Error in call!!!!!!!!!!!!")
-                cur_retry += 1
+            # except Exception as e:
+            #     print(e)
+            #     print("Error in call!!!!!!!!!!!!")
+            #     cur_retry += 1
         return ""
 
 if __name__ == '__main__':
