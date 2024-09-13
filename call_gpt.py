@@ -159,6 +159,7 @@ class Openai():
                 time.sleep(1)
             except Exception as e:
                 print(e)
+                print("Error in call!!!!!!!!!!!!")
                 cur_retry += 1
         return ""
 
