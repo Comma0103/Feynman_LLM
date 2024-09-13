@@ -209,8 +209,8 @@ def main(args):
         os.makedirs(args.save_dir)
     if not os.path.exists(os.path.join(args.save_dir, "results_{}".format(args.exp_name))):
         os.makedirs(os.path.join(args.save_dir, "results_{}".format(args.exp_name)))
-    if not os.path.exists(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd".format(args.expl_model_name, args.taxo_path_src), "test")):
-        os.makedirs(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd".format(args.expl_model_name, args.taxo_path_src), "test"))
+    if not os.path.exists(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test")):
+        os.makedirs(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test"))
 
     all_cors = []
     subject_cors = {}
@@ -267,7 +267,7 @@ def main(args):
         test_expls_df["new_explanations"] = all_new_expls
         test_expls_df.to_csv(
             os.path.join(
-                args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd".format(args.expl_model_name, args.taxo_path_src), "test", "{}_2nd_expls.csv".format(subject)
+                args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test", "{}_2nd_expls.csv".format(subject)
             ),
             index=None,
         )

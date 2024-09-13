@@ -101,6 +101,12 @@ search:
     process_count_per_node: 1
     command:
       - echo $${rank}
+      # - export CUDA_VISIBLE_DEVICES=0,1,2,3
+      - export AMLT_OUTPUT_DIR=/mnt/qilongma/amlt_output/ql-job
+      - ls /mnt/qilongma
+      - sudo apt-get update
+      - sudo apt-get install -y cron vim htop gpustat
+      - pip install -r requirements.txt
       - sleep infinity
     submit_args:
       env:

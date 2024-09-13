@@ -1,6 +1,6 @@
 import random
 import time
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential, AzureCliCredential, get_bearer_token_provider
 from openai import AzureOpenAI
 import openai
 
@@ -68,9 +68,11 @@ class Openai():
             self,
             apis,
             identity_id="18731b9d-0488-49be-bb05-6ccb08f78cf3",
+            tenant_id="72f988bf-86f1-41af-91ab-2d7cd011db47",
 
     ):
         self.identity_id = identity_id
+        self.tenant_id = tenant_id
         flag = True
         while flag:
             try:
@@ -79,9 +81,16 @@ class Openai():
                     "https://cognitiveservices.azure.com/.default"
                 )
                 flag = False
-                break
-            except:
-                continue
+            except Exception as e_A:
+                print(f"DefaultAzureCredential failed with error: {e_A}")
+                try:
+                    self.token_provider = get_bearer_token_provider(
+                        AzureCliCredential(tenant_id=tenant_id),
+                        "https://cognitiveservices.azure.com/.default"
+                    )
+                    flag = False
+                except Exception as e_B:
+                    print(f"AzureCliCredential failed with error: {e_B}")
 
         self.clients_weight = [apis[i]['speed'] for i in range(len(apis))]
         weight_sum = sum(self.clients_weight)
