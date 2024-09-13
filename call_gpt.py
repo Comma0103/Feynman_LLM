@@ -3,6 +3,7 @@ import time
 from azure.identity import DefaultAzureCredential, AzureCliCredential, get_bearer_token_provider
 from openai import AzureOpenAI
 import openai
+import azure
 
 
 API_INFOS = {
@@ -80,18 +81,15 @@ class Openai():
                     DefaultAzureCredential(managed_identity_client_id=self.identity_id),
                     "https://cognitiveservices.azure.com/.default"
                 )
-                print("DefaultAzureCredential success!!!!!!!!!!!")
+                print("DefaultAzureCredential init success")
+                self.token_provider_cli = get_bearer_token_provider(
+                    AzureCliCredential(tenant_id=tenant_id),
+                    "https://cognitiveservices.azure.com/.default"
+                )
+                print("AzureCliCredential init success")
                 flag = False
-            except Exception as e_A:
-                print(f"DefaultAzureCredential failed with error: {e_A}")
-                try:
-                    self.token_provider = get_bearer_token_provider(
-                        AzureCliCredential(tenant_id=tenant_id),
-                        "https://cognitiveservices.azure.com/.default"
-                    )
-                    flag = False
-                except Exception as e_B:
-                    print(f"AzureCliCredential failed with error: {e_B}")
+            except Exception as e:
+                print(f"token provider init failed with error: {e}, retrying...")
 
         self.clients_weight = [apis[i]['speed'] for i in range(len(apis))]
         weight_sum = sum(self.clients_weight)
@@ -107,6 +105,13 @@ class Openai():
             api_version="2024-04-01-preview",
             max_retries=0,
         )
+        self.client_cli = AzureOpenAI(
+            azure_endpoint=selected_api['endpoints'],
+            azure_ad_token_provider=self.token_provider_cli,
+            api_version="2024-04-01-preview",
+            max_retries=0,
+        )
+        self.default_client = self.client
         self.model = selected_api['model']
 
 
@@ -119,7 +124,7 @@ class Openai():
              },
         ]
 
-        client = self.client
+        client = self.default_client
         model = self.model
 
         max_retry = 5
@@ -157,10 +162,17 @@ class Openai():
                 return results
             except openai.RateLimitError as e:
                 time.sleep(1)
-            # except Exception as e:
-            #     print(e)
-            #     print("Error in call!!!!!!!!!!!!")
-            #     cur_retry += 1
+            except azure.core.exceptions.ClientAuthenticationError as e:
+                print(f"azure.core.exceptions.ClientAuthenticationError: {e}")
+                if self.default_client == self.client:
+                    self.default_client = self.client_cli
+                    client = self.client_cli
+                else:
+                    self.default_client = self.client
+                    client = self.client
+            except Exception as e:
+                print(e)
+                cur_retry += 1
         return ""
 
 if __name__ == '__main__':
