@@ -105,7 +105,7 @@ search:
       - export AMLT_OUTPUT_DIR=/mnt/qilongma/amlt_output/ql-job
       - ls /mnt/qilongma
       - sudo apt-get update
-      - sudo apt-get install -y cron vim htop gpustat nvitop
+      - sudo apt-get install -y cron vim htop gpustat
       - curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
       - pip install -r requirements.txt
       - sleep infinity
