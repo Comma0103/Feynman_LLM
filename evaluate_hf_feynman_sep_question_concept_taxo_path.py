@@ -23,11 +23,14 @@ def format_example(df, idx, include_answer=True):
     k = df.shape[1] - 2 # no. of choices
     for j in range(k):
         prompt += "\n{}. {}".format(choices[j], df.iloc[idx, j+1]) # choices
+    prompt += "\nAnswer:"
     if include_answer:
-        prompt += "\nAnswer:"
-        prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
-    else:
-        prompt += "\nAnswer (choosing from A, B, C, and D):"
+        prompt += " {}\n\n".format(df.iloc[idx, k + 1])  # answer
+    # if include_answer:
+    #     prompt += "\nAnswer:"
+    #     prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
+    # else:
+    #     prompt += "\nAnswer (choosing from A, B, C, and D):"
     return prompt
 
 def gen_prompt(train_df, subject, k=-1):
