@@ -1,4 +1,4 @@
-# azure_storage==0.37.0
+# azure_storage
 matplotlib
 numpy
 openai
@@ -9,4 +9,4 @@ torch
 tqdm
 transformers
 accelerate
-# vllm==0.6.1
+# vllm
