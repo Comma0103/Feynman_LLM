@@ -244,9 +244,9 @@ def main(args):
         test_expls_df = pd.read_csv(
             os.path.join(
                 args.expl_dir,
-                "expls_{}_sep_taxo_path_{}".format(args.expl_model_name, args.taxo_path_src),
+                "expls_{}_sep_taxo_path_{}_2nd".format(args.expl_model_name, args.taxo_path_src),
                 "test",
-                subject + "_expls.csv",
+                subject + "_2nd_expls.csv",
             )
         )
 
@@ -315,8 +315,8 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", "-d", type=str, default="/data/qilongma/mmlu_data")
     parser.add_argument("--expl_dir", "-e", type=str, default="explanations")
     parser.add_argument("--save_dir", "-s", type=str, default="results")
-    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-2-7B-hf")
-    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-2-7B")
+    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-3-8B")
+    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-3-8B")
     parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
     parser.add_argument("--expl_model_name", "-en", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
