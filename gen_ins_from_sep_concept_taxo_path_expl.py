@@ -81,8 +81,8 @@ def main(args):
     if not os.path.exists(args.ins_dir):
         os.makedirs(args.ins_dir)
     # TODO: ================= resume from here =================
-    if not os.path.exists(os.path.join(args.expl_dir, "ins_{}_sep_taxo_path_{}".format(args.ins_model_name, args.taxo_path_src))):
-        os.makedirs(os.path.join(args.expl_dir, "ins_{}_sep_taxo_path_{}".format(args.ins_model_name, args.taxo_path_src)))
+    if not os.path.exists(os.path.join(args.ins_dir, "ins_{}_sep_taxo_path_{}".format(args.ins_model_name, args.taxo_path_src))):
+        os.makedirs(os.path.join(args.ins_dir, "ins_{}_sep_taxo_path_{}".format(args.ins_model_name, args.taxo_path_src)))
 
     for subject in subjects:
         print('Generating explanations for ', subject, '...', sep='', end='\t')
