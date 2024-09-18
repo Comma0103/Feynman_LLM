@@ -25,11 +25,14 @@ def format_example(df, idx, include_answer=True):
     k = df.shape[1] - 2 # no. of choices
     for j in range(k):
         prompt += "\n{}. {}".format(choices[j], df.iloc[idx, j+1]) # choices
+    prompt += "\nAnswer:"
     if include_answer:
-        prompt += "\nAnswer:"
-        prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
-    else:
-        prompt += "\nAnswer (choosing from A, B, C, and D):"
+        prompt += " {}\n\n".format(df.iloc[idx, k + 1])  # answer
+    # if include_answer:
+    #     prompt += "\nAnswer:"
+    #     prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
+    # else:
+    #     prompt += "\nAnswer (choosing from A, B, C, and D):"
     return prompt
 
 def gen_prompt(train_df, subject, k=-1):
@@ -209,8 +212,8 @@ def main(args):
         os.makedirs(args.save_dir)
     if not os.path.exists(os.path.join(args.save_dir, "results_{}".format(args.exp_name))):
         os.makedirs(os.path.join(args.save_dir, "results_{}".format(args.exp_name)))
-    if not os.path.exists(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test")):
-        os.makedirs(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test"))
+    if not os.path.exists(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_{}_wo_choosing_2nd".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test")):
+        os.makedirs(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}_{}_wo_choosing_2nd".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test"))
 
     all_cors = []
     subject_cors = {}
@@ -267,7 +270,7 @@ def main(args):
         test_expls_df["new_explanations"] = all_new_expls
         test_expls_df.to_csv(
             os.path.join(
-                args.expl_dir, "expls_{}_sep_taxo_path_{}_2nd_{}".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test", "{}_2nd_expls.csv".format(subject)
+                args.expl_dir, "expls_{}_sep_taxo_path_{}_{}_wo_choosing_2nd".format(args.expl_model_name, args.taxo_path_src, args.model_name), "test", "{}_2nd_expls.csv".format(subject)
             ),
             index=None,
         )
@@ -313,5 +316,5 @@ if __name__ == "__main__":
     parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
     parser.add_argument("--expl_model_name", "-em", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
-    args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}_2nd"
+    args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}_wo_choosing_2nd"
     main(args)
