@@ -245,7 +245,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-3-8B")
     parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-3-8B")
     parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
-    parser.add_argument("--expl_model_name", "-em", type=str, default="OpenAI-GPT-4o-mini")
+    parser.add_argument("--expl_model_name", "-en", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
     args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}_wo_choosing"
     main(args)
