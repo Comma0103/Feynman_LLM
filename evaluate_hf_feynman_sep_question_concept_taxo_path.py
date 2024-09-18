@@ -75,7 +75,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df, dev_expls_df, test_ex
     all_probs = []
     answers = choices[:test_df.shape[1]-2]
 
-    for i in tqdm(range(test_df.shape[0])):
+    for i in tqdm(range(test_df.shape[0]), ncols=75):
         # get prompt and make sure it fits
         k = args.ntrain
         prompt_end = "Now, you will answer the following question:\n"
@@ -242,8 +242,8 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", "-d", type=str, default="/data/qilongma/mmlu_data")
     parser.add_argument("--expl_dir", "-e", type=str, default="explanations")
     parser.add_argument("--save_dir", "-s", type=str, default="results")
-    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-2-70B-hf")
-    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-2-70B")
+    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-3-8B")
+    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-3-8B")
     parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
     parser.add_argument("--expl_model_name", "-em", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
