@@ -171,7 +171,7 @@ class Openai():
                     self.default_client = self.client
                     client = self.client
             except Exception as e:
-                print("Other Exceptions:", e)
+                print("Other Exceptions: ", e)
                 cur_retry += 1
         return ""
 
