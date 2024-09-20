@@ -163,7 +163,7 @@ class Openai():
             except openai.RateLimitError as e:
                 time.sleep(1)
             except azure.core.exceptions.ClientAuthenticationError as e:
-                print(f"azure.core.exceptions.ClientAuthenticationError: {e}")
+                print(f"An azure.core.exceptions.ClientAuthenticationError occured: {e}")
                 if self.default_client == self.client:
                     self.default_client = self.client_cli
                     client = self.client_cli
