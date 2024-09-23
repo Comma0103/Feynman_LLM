@@ -14,79 +14,58 @@ from mmlu_categories import categories, subcategories
 
 from tqdm import tqdm
 
-choices = ["A", "B", "C", "D"]
 
-
-def format_subject(subject):
-    l = subject.split("_")
-    # s = ""
-    # for entry in l:
-    #     s += " " + entry
-    s = " ".join(l)
-    return s
-
-def format_example(df, idx, include_answer=True):
-    prompt = df.iloc[idx, 0] # question
-    k = df.shape[1] - 2 # no. of choices
+def format_example(question, choices, answer, include_answer=True):
+    choices = sorted(choices, key=lambda x: x['label'])
+    prompt = question # question
+    k = len(choices) # no. of choices
     for j in range(k):
-        prompt += "\n{}. {}".format(choices[j], df.iloc[idx, j+1]) # choices
+        prompt += "\n{}. {}".format(choices[j]['label'], choices[j]['text']) # choices
     prompt += "\nAnswer:"
     if include_answer:
-        prompt += " {}\n\n".format(df.iloc[idx, k + 1]) # answer
+        prompt += " {}\n\n".format(answer) # answer
     return prompt
 
-def gen_concept_request(df, subject, i):
-    q_with_a = format_example(df, i)
+def gen_concept_request(question, choices, answer, level, grade):
+    q_with_a = format_example(question, choices, answer)
     request = (
-        "Assume you are a teacher or an LLM trainer, tasked with teaching about {0}.\n\n" + \
-        "There is a multiple choice question (with answer) about {0}:\n" + \
-        "{1}" + \
-        "Based on your understanding of this question and {0}, " + \
-        "could you briefly and clearly extract few central concepts covered in the question to teach someone who is not familiar with {0}, " + \
+        "Assume you are a teacher or an LLM trainer, tasked with teaching about science exam questions that span several grades. " + \
+        "Each question has a multiple choice structure (typically 4 answer options, some could have 3 or 5). " + \
+        "The questions are sorted into a Challenge Set of 'hard' questions (those that both a retrieval and a co-occurrence method fail to answer correctly) and an Easy Set of questions.\n\n" + \
+        "There is a multiple choice question (with answer) at grade {1} in the {0} set:\n\n" + \
+        "{2}" + \
+        "Based on your understanding of this question and the information above, " + \
+        "could you briefly and clearly extract few central concepts covered in the question to teach someone who is not familiar with the relative knowledges, " + \
         "or a smaller language model, so that they can answer this question? " + \
         "Just simply list the extracted concepts (separated by comma and space, uppercase for the first letter) themselves only within 64 tokens, " + \
         "DO NOT include the answer:" # DO NOT number or explain them, and  or use any font format
-    ).format(format_subject(subject), q_with_a)
+    ).format(level, grade, q_with_a)
     return request
 
 @torch.no_grad()
 def gen_concept(args, teacher_client, data_path, concept_path):
-    # df.columns = ['questions', 'A', 'B', 'C', 'D', 'answers']
-    # concepts = []
-    # for i in tqdm(range(df.shape[0])):
-    #     # get prompt and make sure it fits
-    #     concept = teacher_client.call(gen_concept_request(df, subject, i))
-    #     concepts.append(concept)
-    # df['concepts'] = concepts
-
-    # os.makedirs(os.path.join(args.concept_dir, "concepts_{}".format(args.concept_model_name), df_names[df_idx]), exist_ok=True)
-    # df.to_csv(
-    #     os.path.join(
-    #         args.concept_dir, "concepts_{}".format(args.concept_model_name), df_names[df_idx], subject + "_concepts.csv"
-    #     ),
-    #     index=False,
-    # )
+    level = 'challenge' if 'Challenge' in data_path else 'easy' if 'Easy' in data_path else 'unknown'
+    data_csv_path = data_path.replace('.jsonl', '.csv')
     
+    df = pd.read_csv(data_csv_path)
     with open(data_path, 'r', encoding='utf-8') as data_f:
         question_data_list = [json.loads(line) for line in data_f]
+    if len(df) != len(question_data_list):
+        raise ValueError(f"The number of questions in the CSV file ({len(df)}) does not match the number of questions in the JSONL file ({len(question_data_list)}).")
+    
     with open(concept_path, 'w', encoding='utf-8') as concept_f:
-        for question_data in tqdm(question_data_list):
-            question = question_data['question']
-            choices = question_data['choices']
-            answer = question_data['answer']
-            prompt = question
-            for choice in choices:
-                prompt += "\n{}".format(choice)
-            prompt += "\nAnswer: {}".format(answer)
-            concept = teacher_client.call(
-                gen_concept_request(pd.DataFrame([[question] + choices + [answer]]), os.path.basename(data_path).split('-')[0], 0)
-            )
-            concept_f.write(json.dumps({
-                "question": question,
-                "choices": choices,
-                "answer": answer,
-                "concepts": concept
-            }) + "\n")
+        for idx, question_data in enumerate(tqdm(question_data_list, ncols=75)):
+            if df.iloc[idx, 0] != question_data['id']:
+                raise ValueError(f"The question IDs of question #{idx+1} in the CSV file ({df.iloc[idx, 0]}) and the JSONL file ({question_data['id']}) do not match.")
+            question = question_data['question']['stem']
+            choices = question_data['question']['choices']
+            answer = question_data['answerKey']
+            grade = df.iloc[idx, 7]
+            
+            concept = teacher_client.call(gen_concept_request(question, choices, answer, level, grade))
+            question_data['concepts'] = concept
+            
+            concept_f.write(json.dumps(question_data) + "\n")
 
 
 def main(args):
