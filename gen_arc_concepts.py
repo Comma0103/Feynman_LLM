@@ -85,7 +85,7 @@ def main(args):
     for level in difficulty_levels:
         data_splits = ['Dev', 'Train', 'Test']
         for split in data_splits:
-            print('Generating concepts for ', f'{level}-{split}', '...', sep='', end='\t')
+            print('Generating concepts for ', f'{level}-{split}', '...', sep='', end='\n')
             tic = time.time()
             
             data_path = os.path.join(args.data_dir, level, f'{level}-{split}.jsonl')
