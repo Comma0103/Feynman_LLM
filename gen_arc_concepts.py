@@ -10,8 +10,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from call_gpt import Openai, API_INFOS
 
-from mmlu_categories import categories, subcategories
-
 from tqdm import tqdm
 
 
