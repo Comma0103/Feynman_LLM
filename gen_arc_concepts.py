@@ -59,7 +59,7 @@ def gen_concept(args, teacher_client, data_path, concept_path):
             choices = question_data['question']['choices']
             answer = question_data['answerKey']
             grade = df.iloc[idx, 7]
-            question_data['grade'] = grade
+            question_data['grade'] = str(grade)
             
             concept = teacher_client.call(gen_concept_request(question, choices, answer, level, grade))
             question_data['concepts'] = concept
