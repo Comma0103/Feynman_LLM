@@ -47,42 +47,12 @@ def gen_few_shot_prompt(dev_data_list, level, k=-1):
         prompt += format_example(question, choices, answer)
     return prompt
 
-def gen_expl_prompt(concepts=None, taxonomy_paths=None, explanations=None):
-    if not pd.isna(concepts) and not pd.isna(taxonomy_paths) and not pd.isna(explanations):
-        expl_prompt = "Here are some concepts with their path in the taxonomy system (if not found, understand according to your knowledge), " + \
-                "and explanations of the concepts (if not available, understand according to your knowledge), which may be useful:\n"
-        concepts_list = concepts.split(", ")
-        taxonomy_paths_list = [e.split(": ")[1] if ": " in e else e for e in taxonomy_paths.split(";|; ")]
-        explanations_list = [e.split(": ")[1] if ": " in e else e for e in explanations.split(";|; ")]
-        for concept, taxo_path, expl in zip(concepts_list, taxonomy_paths_list, explanations_list):
-            expl_prompt += "Concept: {}, Taxonomy Path: {}, Explanation: {}\n".format(concept, taxo_path, expl)
-        expl_prompt += "\n"
-    elif not pd.isna(concepts) and not pd.isna(taxonomy_paths):
-        expl_prompt = "Here are some concepts with their path in the taxonomy system (if not found, understand according to your knowledge), " + \
-                "which may be useful:\n"
-        concepts_list = concepts.split(", ")
-        taxonomy_paths_list = [e.split(": ")[1] if ": " in e else e for e in taxonomy_paths.split(";|; ")]
-        for concept, taxo_path in zip(concepts_list, taxonomy_paths_list):
-            expl_prompt += "Concept: {}, Taxonomy Path: {}.\n".format(concept, taxo_path)
-        expl_prompt += "\n"
-    elif not pd.isna(concepts):
-        expl_prompt = "Here are some concepts that may be useful:\n"
-        expl_prompt += concepts
-        expl_prompt += ".\n\n"
-    else:
-        expl_prompt = ""
-    return expl_prompt
         
 @torch.no_grad()
-def eval(args, level, model, tokenizer, dev_data_list, test_data_list, dev_expl_list, test_expl_list):
+def eval(args, level, model, tokenizer, dev_data_list, test_data_list):
     cors = []
     all_probs = []
     
-    if len(dev_data_list) != len(dev_expl_list):
-        raise ValueError(f"The number of questions in the dev data file ({len(dev_data_list)}) does not match with the dev expl file ({len(dev_expl_list)}).")
-    if len(test_data_list) != len(test_expl_list):
-        raise ValueError(f"The number of questions in the test data file ({len(test_data_list)}) does not match with the test expl file ({len(test_expl_list)}).")
-
     for i in tqdm(range(len(test_data_list)), ncols=75):
         question = test_data_list[i]['question']['stem']
         choices = test_data_list[i]['question']['choices']
@@ -92,18 +62,13 @@ def eval(args, level, model, tokenizer, dev_data_list, test_data_list, dev_expl_
         prompt_end = "Now, you will answer the following question:\n"
         prompt_end += format_example(question, choices, None, include_answer=False)
         few_shot_prompt = gen_few_shot_prompt(dev_data_list, level, k)
-        expl_prompt = gen_expl_prompt(
-            test_expl_list[i]["concepts"],
-            test_expl_list[i]["taxonomy_path"],
-            test_expl_list[i]["explanations"]
-        )
-        prompt = expl_prompt + few_shot_prompt + prompt_end
+        prompt = few_shot_prompt + prompt_end
 
         input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
         while input_ids.shape[-1] > 2048 and k > 0:
             k -= 1
             few_shot_prompt = gen_few_shot_prompt(dev_data_list, level, k)
-            prompt = expl_prompt + few_shot_prompt + prompt_end
+            prompt = few_shot_prompt + prompt_end
             input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
 
         label = answer
@@ -167,12 +132,8 @@ def main(args):
             dev_data_list = [json.loads(line) for line in dev_f]
         with open(os.path.join(args.data_dir, level, f'{level}-Test.jsonl'), 'r', encoding='utf-8') as test_f:
             test_data_list = [json.loads(line) for line in test_f]
-        with open(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}".format(args.expl_model_name, args.taxo_path_src), f'{level}-Dev_expls.jsonl'), 'r', encoding='utf-8') as dev_expl_f:
-            dev_expl_list = [json.loads(line) for line in dev_expl_f]
-        with open(os.path.join(args.expl_dir, "expls_{}_sep_taxo_path_{}".format(args.expl_model_name, args.taxo_path_src), f'{level}-Test_expls.jsonl'), 'r', encoding='utf-8') as test_expl_f:
-            test_expl_list = [json.loads(line) for line in test_expl_f]
 
-        cors, acc, probs = eval(args, level, model, tokenizer, dev_data_list, test_data_list, dev_expl_list, test_expl_list)
+        cors, acc, probs = eval(args, level, model, tokenizer, dev_data_list, test_data_list)
         level_cors[level].append(cors)
         level_split_cors[f'{level}-Test'] = cors
         all_cors.append(cors)
@@ -213,12 +174,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ndev", "-k", type=int, default=5, help="Number of few-shot questions in the prompt")
     parser.add_argument("--data_dir", "-d", type=str, default="/data/qilongma/ARC-V1-Feb2018")
-    parser.add_argument("--expl_dir", "-e", type=str, default="explanations/arc")
     parser.add_argument("--save_dir", "-s", type=str, default="results/arc")
     parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-3-8B")
     parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-3-8B")
-    parser.add_argument("--taxo_path_src", "-tp", type=str, default="gen", choices=["gen", "search"])
-    parser.add_argument("--expl_model_name", "-en", type=str, default="OpenAI-GPT-4o-mini")
     args = parser.parse_args()
-    args.exp_name = f"{args.model_name}_feynman_{args.expl_model_name}_sep_question_concept_taxo_path_{args.taxo_path_src}_wo_choosing"
+    args.exp_name = f"{args.model_name}"
     main(args)
