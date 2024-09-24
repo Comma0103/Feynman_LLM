@@ -90,7 +90,7 @@ def process_arc_file(file_path, output_split_dir):
                     path = find_taxonomy_path(question, choices, answer, level, grade, concept)
                     paths.append(path if path is not None else concept + ": Not found")
                     cnt_tot_file += 1
-                    if path is None:
+                    if 'Not found' in path:
                         cnt_404_file += 1
                 concept_data_list[i]['taxonomy_path'] = ";|; ".join(paths)
 
@@ -119,7 +119,7 @@ def process_arc_files(concept_dir, taxonomy_dir, output_dir, max_workers=16):
     # Collect all file paths
     file_paths = [[], []]
     for file in sorted(os.listdir(concept_dir)):
-        if file.startswith('ARC-') and file.endswith('.jsonl'):
+        if file.startswith('ARC-') and file.endswith('_concepts.jsonl'):
             file_paths[0].append(os.path.join(concept_dir, file))
             file_paths[1].append(output_dir)
     print(f"Found {len(file_paths[0])} files to process")

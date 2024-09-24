@@ -89,7 +89,7 @@ def main(args):
             tic = time.time()
             
             data_path = os.path.join(args.data_dir, level, f'{level}-{split}.jsonl')
-            concept_path = os.path.join(args.concept_dir, "concepts_{}".format(args.concept_model_name), f'{level}-{split}.jsonl')
+            concept_path = os.path.join(args.concept_dir, "concepts_{}".format(args.concept_model_name), f'{level}-{split}_concepts.jsonl')
             gen_concept(args, oai_client, data_path, concept_path)
             
             toc = time.time()

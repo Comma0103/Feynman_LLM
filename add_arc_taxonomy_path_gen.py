@@ -109,7 +109,7 @@ def process_arc_files(args):
     # Collect all file paths
     file_paths = [[], []]
     for file in sorted(os.listdir(args.concept_dir)):
-        if file.startswith('ARC-') and file.endswith('.jsonl'):
+        if file.startswith('ARC-') and file.endswith('_concepts.jsonl'):
             file_paths[0].append(os.path.join(args.concept_dir, file))
             file_paths[1].append(args.output_dir)
     print(f"Found {len(file_paths[0])} files to process")
