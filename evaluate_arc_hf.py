@@ -12,11 +12,11 @@ from mmlu_categories import categories, subcategories
 
 from tqdm import tqdm
 
-# seed = 42
-# np.random.seed(seed)
-# torch.manual_seed(seed)
-# torch.cuda.manual_seed_all(seed)
-# torch.backends.cudnn.deterministic = True
+seed = 42
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+torch.backends.cudnn.deterministic = True
 
 
 def format_example(question, choices, answer, include_answer=True):
@@ -39,8 +39,8 @@ def gen_few_shot_prompt(dev_data_list, level, k=-1):
     prompt = f"The following are multiple choice questions (with answers) in {level} dataset.\n\n"
     if k == -1:
         k = 5 # no. of questions
-    for i in range(k):
-        random_idx = np.random.randint(len(dev_data_list))
+    random_indices = np.random.choice(len(dev_data_list), k, replace=False)
+    for random_idx in random_indices:
         question = dev_data_list[random_idx]['question']['stem']
         choices = dev_data_list[random_idx]['question']['choices']
         answer = dev_data_list[random_idx]['answerKey']
@@ -71,11 +71,11 @@ def eval(args, level, model, tokenizer, dev_data_list, test_data_list):
             prompt = few_shot_prompt + prompt_end
             input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
 
-        label = answer
+        label = str(answer)
 
         logits = model(input_ids=input_ids).logits[0, -1]
 
-        choice_labels = sorted([choice['label'] for choice in choices])
+        choice_labels = sorted([str(choice['label']) for choice in choices])
         probs = (
             torch.nn.functional.softmax(
                 torch.tensor([logits[tokenizer(choice_label).input_ids[-1]] for choice_label in choice_labels]).float(),
@@ -86,7 +86,7 @@ def eval(args, level, model, tokenizer, dev_data_list, test_data_list):
             .numpy()
         )
         pred = choice_labels[np.argmax(probs)]
-        probs_dict = {choice_labels[i]: probs[i] for i in range(len(choice_labels))}
+        probs_dict = {choice_labels[i]: str(probs[i]) for i in range(len(choice_labels))}
 
         cor = pred == label
         cors.append(cor)
@@ -139,7 +139,7 @@ def main(args):
         all_cors.append(cors)
 
         for i in range(len(cors)):
-            test_data_list[i]["{}_correct".format(args.model_name)] = cors[i]
+            test_data_list[i]["{}_correct".format(args.model_name)] = bool(cors[i])
             test_data_list[i]["{}_choice_probs".format(args.model_name)] = probs[i]
         with open(os.path.join(args.save_dir, "results_{}".format(args.exp_name), f'{level}-Test_results.jsonl'), 'w', encoding='utf-8') as out_f:
             for test_data in test_data_list:
@@ -175,8 +175,8 @@ if __name__ == "__main__":
     parser.add_argument("--ndev", "-k", type=int, default=5, help="Number of few-shot questions in the prompt")
     parser.add_argument("--data_dir", "-d", type=str, default="/data/qilongma/ARC-V1-Feb2018")
     parser.add_argument("--save_dir", "-s", type=str, default="results/arc")
-    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-3-8B")
-    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-3-8B")
+    parser.add_argument("--model_path", "-m", type=str, default="/home/lidong1/qilongma/blob/public_models/Meta-Llama-2-7B-hf")
+    parser.add_argument("--model_name", "-n", type=str, default="Meta-Llama-2-7B")
     args = parser.parse_args()
     args.exp_name = f"{args.model_name}"
     main(args)
